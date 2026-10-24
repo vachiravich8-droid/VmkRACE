@@ -277,13 +277,14 @@ function page(name) {
   return pages[name];
 }
 function sendPage(res, name) {
-  try {
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store',
-      'X-Frame-Options': 'SAMEORIGIN', 'Referrer-Policy': 'no-referrer' });
-    res.end(page(name));
-  } catch (e) {
-    send(res, 500, { error: name + ' is missing next to server.js' });
+  let html;
+  try { html = page(name); } catch (e) {
+    // (the page file wasn't uploaded next to server.js)
+    return send(res, 404, { error: name + ' is missing: upload it to GitHub next to server.js' });
   }
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store',
+    'X-Frame-Options': 'SAMEORIGIN', 'Referrer-Policy': 'no-referrer' });
+  res.end(html);
 }
 
 // allow the panel to be opened from another address (a saved file, another site) and still talk to the bridge.
